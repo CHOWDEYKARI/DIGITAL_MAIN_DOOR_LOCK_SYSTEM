@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Home Door Lock System</title>
+    <style>
+        /* Your existing CSS styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(120deg, #8e44ad, #3498db, #e74c3c, #f1c40f);
+            animation: gradientBackground 6s infinite alternate;
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 50% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .container {
+            width: 450px;
+            background: linear-gradient(to right, #2ecc71, #27ae60, #16a085);
+            border: 6px solid #f39c12;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s;
+        }
+
+        .display-box {
+            font-size: 1.8em;
+            padding: 15px;
+            background: #fff;
+            border: 4px solid #9b59b6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px #9b59b6; }
+            50% { box-shadow: 0 0 15px #9b59b6; }
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #e74c3c, #f39c12, #f1c40f);
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: blinkColors 3s infinite alternate;
+            transition: transform 0.3s;
+            width: 60px; /* Set fixed button width */
+            height: 60px; /* Set fixed button height */
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        button img {
+            width: 25px;
+            height: 25px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        @keyframes blinkColors {
+            0% { background: rgb(255, 0, 150); }
+            25% { background: rgb(0, 150, 255); }
+            50% { background: rgb(0, 255, 150); }
+            75% { background: rgb(255, 150, 0); }
+            100% { background: rgb(150, 0, 255); }
+        }
+
+        .message {
+            font-size: 1.2em;
+            margin-top: 15px;
+            color: #fff;
+        }
+
+        .buttons-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .buttons-row button {
+            margin: 5px;
+        }
+
+        /* Make it responsive */
+        @media (max-width: 500px) {
+            .container {
+                width: 95%;
+            }
+
+            button {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .buttons-row {
+                flex-direction: row;
+            }
+        }
+
+        /* For mobile keypad arrangement */
+        @media (max-width: 768px) {
+            .buttons-row {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); /* 3 buttons per row */
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+                height: 80px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="color: #fff; text-shadow: 1px 1px 2px #000;">Miss Snehitha Chowdary's father's main door digital lock system.</h2>
+        <div class="display-box" id="displayBox">Enter Password</div>
+        <div class="buttons-row">
+            <!-- Number Buttons -->
+            <button onclick="addCharacter('1')">1</button>
+            <button onclick="addCharacter('2')">2</button>
+            <button onclick="addCharacter('3')">3</button>
+            <button onclick="addCharacter('4')">4</button>
+            <button onclick="addCharacter('5')">5</button>
+            <button onclick="addCharacter('6')">6</button>
+            <button onclick="addCharacter('7')">7</button>
+            <button onclick="addCharacter('8')">8</button>
+            <button onclick="addCharacter('9')">9</button>
+            <button onclick="addCharacter('*')">*</button>
+            <button onclick="addCharacter('0')">0</button>
+            <button onclick="addCharacter('#')">#</button>
+        </div>
+        <div>
+            <!-- Functional Buttons -->
+            <button onclick="createPassword()"><img src="./g1.gif" alt="Create">Create</button>&nbsp;&nbsp;&nbsp;
+            <button onclick="validatePassword()"><img src="./g2.gif" alt="Unlock">Unlock</button>&nbsp;&nbsp;&nbsp;
+            <button onclick="lockDoor()"><img src="./g2_lock.gif" alt="Lock">Lock</button>&nbsp;&nbsp;&nbsp;
+            <button onclick="resetFields()"><img src="./g3_reset.gif" alt="Reset">Reset</button>&nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="message" id="messageBox"></div>
+    </div>
+
+    <script>
+        const displayBox = document.getElementById('displayBox');
+        const messageBox = document.getElementById('messageBox');
+        let enteredPassword = '';
+        let storedPassword = localStorage.getItem('doorPassword') || null;
+
+        function addCharacter(char) {
+            if (enteredPassword.length < 6) {
+                enteredPassword += char;
+                displayBox.textContent = '*'.repeat(enteredPassword.length);
+            }
+        }
+
+        function createPassword() {
+            if (enteredPassword.length !== 6) {
+                speak('Password must be exactly six digits.');
+                messageBox.textContent = 'Password must be exactly six digits!';
+                return;
+            }
+            storedPassword = enteredPassword;
+            localStorage.setItem('doorPassword', storedPassword);
+            speak('Congratulations, your password has been created successfully.');
+            messageBox.textContent = 'Password created successfully!';
+            resetFields();
+        }
+
+        function validatePassword() {
+            if (!storedPassword) {
+                speak('No password found. Please create a password first.');
+                messageBox.textContent = 'No password found. Please create a password.';
+                return;
+            }
+            if (enteredPassword === storedPassword) {
+                speak('Password correct. Door is now unlocked.');
+                messageBox.textContent = 'Door Unlocked!';
+                document.body.style.background = 'linear-gradient(120deg, #2ecc71, #27ae60)';
+            } else {
+                speak('Incorrect password. Please try again.');
+                messageBox.textContent = 'Incorrect Password!';
+                document.body.style.background = 'linear-gradient(120deg, #e74c3c, #c0392b)';
+            }
+            resetFields();
+        }
+
+        function lockDoor() {
+            speak('The door has been locked.');
+            messageBox.textContent = 'Door Locked!';
+            document.body.style.background = 'linear-gradient(120deg, #3498db, #2980b9)';
+        }
+
+        function resetFields() {
+            enteredPassword = '';
+            displayBox.textContent = 'Enter Password';
+            messageBox.textContent = '';
+        }
+
+        function speak(message) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(message);
+            utterance.voice = synth.getVoices().find(voice => voice.lang === 'en-US' && voice.name.includes('Female')) || synth.getVoices()[0];
+            synth.speak(utterance);
+        }
+    </script>
+</body>
+</html>
